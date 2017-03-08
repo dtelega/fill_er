@@ -53,21 +53,19 @@ void	get_field(t_info *inf)
 	char	**split;
 
 	line = NULL;
-	get_next_line(0, &line);
-	inf->field = ft_strnew(inf->width * inf->lines);
+	inf->field = (char **)malloc((inf->lines + 1) * sizeof(inf->field));
 	split = (char **)malloc(3 * sizeof(split));
 	i = 0;
-	while (i != inf->lines - 1)
+	while (i != inf->lines)
 	{
 		get_next_line(0, &line);
-
 		split = ft_strsplit(line, ' ');
-		inf->field = ft_strjoin(inf->field, split[1]); 
-		inf->field = ft_strjoin(inf->field, "\n");
+		inf->field[i] = ft_strnew(ft_strlen(split[1]));
+		inf->field[i] = ft_strjoin(inf->field[i], split[1]);
 		i++;
 	}
+	inf->field[i] = NULL;
 	free(split);
-
 }
 
 void	get_fig(t_info *inf)
@@ -76,6 +74,7 @@ void	get_fig(t_info *inf)
 	int		lines;
 	int		width;
 	char	**split;
+	int		i;
 
 	line = NULL;
 	get_next_line(0, &line);
@@ -83,14 +82,17 @@ void	get_fig(t_info *inf)
 	lines = ft_atoi(split[1]);
 	width = ft_atoi(split[2]);
 	free(split);
-	inf->fig = ft_strnew(lines * width);
+	inf->fig = (char **)malloc((lines + 1) * sizeof(inf->fig));
+	i = 0;
 	while (lines != 0)
 	{
 		get_next_line(0, &line);
-		inf->fig = ft_strjoin(inf->fig, line);
-		inf->fig = ft_strjoin(inf->fig, "\n");
-		lines--;	
+		inf->fig[i] = ft_strnew(ft_strlen(line));
+		inf->fig[i] = ft_strjoin(inf->fig[i], line);
+		lines--;
+		i++;
 	}
+	inf->fig[i] = NULL;
 }
 
 int		get_data(t_info *inf)
@@ -110,17 +112,82 @@ int		get_data(t_info *inf)
 	return (1);
 }
 
-void	filler(t_info *inf)
+int		pick_traf(t_info *inf)
 {
+	int		zamena;
+	int		x;
+	int		y;
 	int		i;
-	int		k;
+	int		l;
 
+	zamena = 0;
+	y = inf->y_to_print;
 	i = 0;
-	k = 0;
+	l = 0;
+	zamena = 0;
+	while (inf->fig[i] && inf->field[y])
+	{
+		x = inf->x_to_print;
+		l = 0;
+		while (inf->fig[i][l])
+		{
+			if (inf->fig[i][l] == '*' && inf->field[y][x] == inf->player)
+				zamena++;
+			if (inf->field[y][x] != '.' && inf->field[y][x] != 'X' && inf->field[y][x] != 'x' && inf->field[y][x] != 'O' && inf->field[y][x] != 'o')
+				return (0);
+			if (inf->fig[i][l] == '*' && inf->field[y][x] != inf->player && inf->field[y][x] != '.')
+				return (0);
+			l++;
+			x++;
+		}
+		if (inf->fig[i][l] != '\0' || (inf->fig[i] && !inf->field[y]))
+			return (0);
+		i++;
+		y++;
+	}
+	if (zamena != 1 || inf->fig[i])
+		return (0);
+	
+	return (1);
+}
 
-	ft_putstr_fd("1 1\n", 1);
+void	print_res(t_info *inf)
+{
+	ft_putnbr_fd(inf->y_to_print, 1);
+	ft_putstr_fd(" ", 1);
+	ft_putnbr_fd(inf->x_to_print, 1);
+	ft_putstr_fd("\n", 1);
 	free(inf->fig);
 	free(inf->field);
+}
+
+void	filler(t_info *inf)
+{
+
+	inf->y_to_print = 0;
+//	printf("START FILLER\n");
+	while (inf->y_to_print < inf->lines)
+	{
+//		printf("Y = %d\n", inf->y_to_print);
+		inf->x_to_print = 0;
+		while (inf->x_to_print < inf->width)
+		{
+//			printf("Y = %d | ", inf->y_to_print);
+//			printf("X = %d\n", inf->x_to_print);
+			if (pick_traf(inf) == 1)
+			{
+//				printf("/////////////////////////////////////////FINISH");
+//				printf("hato to printf y = %d, x =%d\n", inf->y_to_print, inf->x_to_print);
+				print_res(inf);
+				return ;
+			}
+			inf->x_to_print++;
+		}
+		inf->y_to_print++;
+	}
+	inf->x_to_print = 0;
+	inf->y_to_print = 0;
+	print_res(inf);
 }
 
 int		main()
@@ -131,11 +198,5 @@ int		main()
 		return (0);
 	while (get_data(&inf))
 		filler(&inf);
-//	printf("player = %c\n", inf.player);
-//	printf("%i %i\n", inf.lines, inf.width);
-//	printf("field:\n%s\n", inf.field);
-//	printf("fig\n%s", inf.fig);
-//	put_fig(&inf);
-//	printf("%c\n", inf.player);
 	return (0);
 }

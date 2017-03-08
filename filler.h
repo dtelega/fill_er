@@ -18,8 +18,8 @@
 
 typedef struct 		s_info
 {
-	char		*fig;
-	char		*field;
+	char		**fig;
+	char		**field;
 	int			lines;
 	int			width;
 	int			player;
