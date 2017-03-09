@@ -25,6 +25,10 @@ typedef struct 		s_info
 	int			player;
 	int			x_to_print;
 	int			y_to_print;
+	int			min_dist;
+	int			put_true;
+	int			x_enemy;
+	int			y_enemy;
 }							t_info;
 
 #endif

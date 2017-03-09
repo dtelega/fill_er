@@ -147,7 +147,6 @@ int		pick_traf(t_info *inf)
 	}
 	if (zamena != 1 || inf->fig[i])
 		return (0);
-	
 	return (1);
 }
 
@@ -161,32 +160,60 @@ void	print_res(t_info *inf)
 	free(inf->field);
 }
 
-void	filler(t_info *inf)
+void	get_position_enemy(t_info *inf)
 {
+	int		x_e;
+	int		y_e;
+	char	enemy;
 
-	inf->y_to_print = 0;
-//	printf("START FILLER\n");
-	while (inf->y_to_print < inf->lines)
+	y_e = 0;
+	if (inf->player == 'X')
+		enemy = 'O';
+	else
+		enemy = 'X';
+	while (y_e < inf->lines)
 	{
-//		printf("Y = %d\n", inf->y_to_print);
-		inf->x_to_print = 0;
-		while (inf->x_to_print < inf->width)
+		x_e = 0;
+		while (x_e < inf->width)
 		{
-//			printf("Y = %d | ", inf->y_to_print);
-//			printf("X = %d\n", inf->x_to_print);
-			if (pick_traf(inf) == 1)
+			if (inf->field[y_e][x_e] == enemy)
 			{
-//				printf("/////////////////////////////////////////FINISH");
-//				printf("hato to printf y = %d, x =%d\n", inf->y_to_print, inf->x_to_print);
-				print_res(inf);
+				inf->x_enemy = x_e;
+				inf->y_enemy = y_e;
 				return ;
 			}
-			inf->x_to_print++;
+			x_e++;
 		}
+		y_e++;
+	}
+
+}
+
+void	filler(t_info *inf, int x, int y, int dist)
+{
+	inf->put_true = 0;
+	inf->y_to_print = 0;
+	get_position_enemy(inf);
+	inf->min_dist = 10000;
+	while (inf->y_to_print < inf->lines)
+	{
+		inf->x_to_print = -1;
+		while (++inf->x_to_print < inf->width)
+			if (pick_traf(inf) == 1)
+			{
+				if ((dist = (inf->x_to_print - inf->x_enemy) ^ 2 +
+					(inf->y_to_print - inf->y_enemy) ^ 2) <= inf->min_dist)
+				{
+					inf->min_dist = dist;
+					y = inf->y_to_print;
+					x = inf->x_to_print;
+				}
+				inf->put_true = 1;
+			}
 		inf->y_to_print++;
 	}
-	inf->x_to_print = 0;
-	inf->y_to_print = 0;
+	inf->x_to_print = x;
+	inf->y_to_print = y;
 	print_res(inf);
 }
 
@@ -197,6 +224,6 @@ int		main()
 	if (get_player(&inf) == 1)
 		return (0);
 	while (get_data(&inf))
-		filler(&inf);
+		filler(&inf, 0, 0, 0);
 	return (0);
 }
