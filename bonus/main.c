@@ -5,30 +5,32 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dtelega <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/03/03 17:21:31 by dtelega           #+#    #+#             */
-/*   Updated: 2017/03/03 17:21:33 by dtelega          ###   ########.fr       */
+/*   Created: 2017/03/10 17:38:22 by dtelega           #+#    #+#             */
+/*   Updated: 2017/03/10 17:38:23 by dtelega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "filler.h"
+#include "get_next_line.h"
 
-void	print_res(t_info *inf)
-{
-	ft_putnbr_fd(inf->y_to_print, 1);
-	ft_putstr_fd(" ", 1);
-	ft_putnbr_fd(inf->x_to_print, 1);
-	ft_putstr_fd("\n", 1);
-	free(inf->fig);
-	free(inf->field);
-}
+ // \e[5;32mDEBUG:\e[0m
 
 int		main(void)
 {
-	t_info		inf;
+	char	*s;
+	int		i;
 
-	if (get_player(&inf) == 1)
+	s = NULL;
+	get_next_line(0, &s);
+	while (1)
+	{
+		get_next_line(0, &s);
+		get_next_line(0, &s);
+		while (s[i])
+		{
+			ft_putstr("\e[5;32m");
+			ft_putchar(s[i]);
+			ft_putstr("\e[0m");
+		}
 		return (0);
-	while (get_data(&inf))
-		filler(&inf, 0, 0, 0);
-	return (0);
+	}
 }
