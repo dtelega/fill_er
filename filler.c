@@ -105,23 +105,39 @@ int		where_enemy(t_info *inf, int first, int sec, int three)
 	y = -1;
 	while (++y < inf->lines / 2 && (x = -1))
 		while (++x < inf->width / 2 && (four = 0) == 0)
+		{
 			if (inf->field[y][x] == inf->enemy)
 				first++;
+			if (inf->field[y][x] == inf->player)
+				first--;
+		}
 	y = -1;
 	while (++y < inf->lines / 2 && (x = inf->width / 2 - 1))
 		while (++x < inf->width)
+		{
 			if (inf->field[y][x] == inf->enemy)
 				sec++;
+			if (inf->field[y][x] == inf->player)
+				sec--;
+		}
 	y = inf->lines / 2 - 1;
 	while (++y < inf->lines && (x = -1))
 		while (++x < inf->width / 2)
+		{
 			if (inf->field[y][x] == inf->enemy)
 				three++;
+			if (inf->field[y][x] == inf->player)
+				three--;
+		}
 	y = inf->lines / 2 - 1;
 	while (++y < inf->lines && (x = inf->width / 2 - 1))
 		while (++x < inf->width)
+		{
 			if (inf->field[y][x] == inf->enemy)
 				four++;
+			if (inf->field[y][x] == inf->player)
+				four--;
+		}
 	return (fourth(first, sec, three, four));
 }
 
@@ -145,6 +161,6 @@ void	get_position_centre(t_info *inf)
 	else if (where_enemy(inf, 0, 0, 0) == 4)
 	{
 		inf->x_enemy = inf->width - 1;
-		inf->y_enemy = 2 * inf->lines / 3  - 2;
+		inf->y_enemy = 4 * inf->lines / 5;
 	}
 }
